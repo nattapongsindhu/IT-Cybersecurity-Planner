@@ -1,2 +1,2 @@
 # IT-Cybersecurity-Planner
-My IT Cybersecurity academic and career roadmap at Los Angeles City College.
+Interactive degree planner web app for IT Cybersecurity pathway at LACC. Built with HTML/CSS/JS.
