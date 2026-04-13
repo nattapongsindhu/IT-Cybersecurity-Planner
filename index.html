@@ -461,7 +461,7 @@
   <button onclick="closeMilestone()">Keep Going →</button>
 </div>
 
-<footer>© 2026 Nattapong Sindhu</footer>
+<footer>Powered by <span>Claude.ai</span></footer>
 
 <script>
 /* ── SEMESTERS ── */
@@ -505,8 +505,8 @@ let _lastDeleted=null,_undoTimer=null;
 
 /* ── BUG FIX #3: persist milestone pct in localStorage ── */
 let _prevMilestonePct=loadMilestonePct();
-function loadMilestonePct(){try{return parseInt(localStorage.getItem('itsec_ms_pct_v6'))||0;}catch(e){return 0;}}
-function saveMilestonePct(p){try{localStorage.setItem('itsec_ms_pct_v6',p);}catch(e){}}
+function loadMilestonePct(){try{return parseInt(localStorage.getItem('itsec_ms_pct_v7'))||0;}catch(e){return 0;}}
+function saveMilestonePct(p){try{localStorage.setItem('itsec_ms_pct_v7',p);}catch(e){}}
 
 const MILESTONES=[
   {pct:25,emoji:'🌱',title:'25% Complete',sub:'Solid start — keep the momentum.'},
@@ -517,16 +517,16 @@ const MILESTONES=[
 
 /* ── STORAGE ── */
 function loadCourses(){
-  try{const s=localStorage.getItem('itsec_planner_v6');if(s){const a=JSON.parse(s);if(Array.isArray(a))return a.map(c=>({status:'planned',cat:'other',notes:'',...c}));}}catch(e){}
+  try{const s=localStorage.getItem('itsec_planner_v7');if(s){const a=JSON.parse(s);if(Array.isArray(a))return a.map(c=>({status:'planned',cat:'other',notes:'',...c}));}}catch(e){}
   return DEFAULT_COURSES.map(c=>({...c}));
 }
 /* BUG FIX #1: saveCourses does NOT call showToast — toast only from manualSave */
 function saveCourses(silent=false){
-  try{localStorage.setItem('itsec_planner_v6',JSON.stringify(courses));}catch(e){}
+  try{localStorage.setItem('itsec_planner_v7',JSON.stringify(courses));}catch(e){}
   if(!silent) silentDashUpdate();
 }
-function loadGoal(){try{return parseInt(localStorage.getItem('itsec_goal_v6'))||120;}catch(e){return 120;}}
-function saveGoal(v){try{localStorage.setItem('itsec_goal_v6',v);}catch(e){}}
+function loadGoal(){try{return parseInt(localStorage.getItem('itsec_goal_v7'))||120;}catch(e){return 120;}}
+function saveGoal(v){try{localStorage.setItem('itsec_goal_v7',v);}catch(e){}}
 
 function loadDefaultPlan(){
   if(!confirm('Load the default 19-course IT Cybersecurity plan?\nThis replaces your current plan.'))return;
@@ -984,9 +984,9 @@ document.getElementById('goal-units').addEventListener('change',function(){
 // Theme
 const themeToggle=document.getElementById('theme-toggle');
 const themeIcon=themeToggle.querySelector('.theme-icon');
-function setTheme(light){document.body.classList.toggle('light',light);themeIcon.textContent=light?'☀️':'🌙';try{localStorage.setItem('itsec_theme',light?'light':'dark');}catch(e){}}
+function setTheme(light){document.body.classList.toggle('light',light);themeIcon.textContent=light?'☀️':'🌙';try{localStorage.setItem('itsec_theme_v7',light?'light':'dark');}catch(e){}}
 themeToggle.addEventListener('click',()=>setTheme(!document.body.classList.contains('light')));
-try{if(localStorage.getItem('itsec_theme')==='light')setTheme(true);}catch(e){}
+try{if(localStorage.getItem('itsec_theme_v7')==='light')setTheme(true);}catch(e){}
 
 if(window.innerWidth<=680)document.getElementById('mobile-tabs').style.display='block';
 
