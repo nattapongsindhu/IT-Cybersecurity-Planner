@@ -1,11 +1,7 @@
 # IT-Cybersecurity-Planner
 
-![Planner](https://img.shields.io/badge/App-Degree%20Planner-0A66C2)
-![Focus](https://img.shields.io/badge/Focus-IT%20Cybersecurity-8A2BE2)
-![LACC](https://img.shields.io/badge/LACC-Pathway-006633)
-![HTML](https://img.shields.io/badge/HTML-5-E34F26?logo=html5&logoColor=white)
-![CSS](https://img.shields.io/badge/CSS-3-1572B6?logo=css3&logoColor=white)
-![JavaScript](https://img.shields.io/badge/JavaScript-ES6-F7DF1E?logo=javascript&logoColor=black)
+![Planner](https://img.shields.io/badge/Planner-IT%20Cybersecurity-0A66C2)
+![Stack](https://img.shields.io/badge/Stack-HTML%20%7C%20CSS%20%7C%20JS-1572B6)
 ![Deploy](https://img.shields.io/badge/Deploy-GitHub%20Pages-222222?logo=githubpages&logoColor=white)
 ![License](https://img.shields.io/badge/License-MIT-yellow.svg)
 
