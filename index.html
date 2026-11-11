@@ -4,6 +4,12 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>IT Cybersecurity Planner</title>
+  <meta name="description" content="Completed LACC IT Cybersecurity course plan — 21 courses, 63 units, with terms, status and CompTIA cert targets.">
+  <meta property="og:title" content="IT Cybersecurity Planner">
+  <meta property="og:description" content="Completed LACC IT Cybersecurity course plan — 21 courses, 63 units, with terms, status and CompTIA cert targets.">
+  <meta property="og:type" content="website">
+  <meta name="theme-color" content="#0a0c10">
+  <link rel="icon" href="data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%8E%93%3C/text%3E%3C/svg%3E">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
   <style>
@@ -44,7 +50,6 @@
     .dd-item.green:hover{color:var(--green);}
     .dd-item.gold:hover{color:var(--gold);}
     .dd-item.blue:hover{color:var(--accent);}
-    .dd-item.purple:hover{color:var(--purple);}
     .dd-item.red:hover{color:var(--red);}
     .dd-item.teal:hover{color:var(--teal);}
     .dd-sep{height:1px;background:var(--border);margin:3px 0;}
@@ -83,12 +88,13 @@
     .status-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;}
 
     /* ── STATS ── */
-    .stats-row{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:1.2rem;}
+    .stats-row{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;margin-bottom:1.2rem;}
     .stat-card{background:var(--bg2);border:1px solid var(--border);border-radius:9px;padding:.7rem .85rem;border-left:3px solid var(--accent);}
     .stat-card.gold{border-left-color:var(--gold);}
     .stat-card.green{border-left-color:var(--green);}
     .stat-card.purple{border-left-color:var(--purple);}
     .stat-card.teal{border-left-color:var(--teal);}
+    .stat-card.red{border-left-color:var(--red);}
     .stat-label{font-size:0.54rem;color:var(--muted);font-family:'Space Mono',monospace;text-transform:uppercase;letter-spacing:1px;}
     .stat-val{font-family:'Space Mono',monospace;font-size:1.1rem;font-weight:700;margin-top:2px;}
     .stat-sub{font-size:0.6rem;color:var(--muted);margin-top:1px;}
@@ -216,17 +222,19 @@
     /* Custom tooltip — hover (desktop) + click (touch) */
     .cal-chip .cal-tooltip{position:absolute;bottom:calc(100% + 6px);left:50%;transform:translateX(-50%);background:var(--bg4);border:1px solid var(--border);border-radius:6px;padding:6px 10px;font-size:0.68rem;color:var(--text);white-space:nowrap;pointer-events:none;opacity:0;transition:opacity .15s;z-index:100;line-height:1.5;}
     .cal-chip:hover .cal-tooltip{opacity:1;}
+    .cal-chip:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
     .cal-chip.tip-open .cal-tooltip{opacity:1;pointer-events:auto;}
     .cal-code{font-family:'Space Mono',monospace;font-size:0.65rem;font-weight:700;}
     .cal-units{font-family:'Space Mono',monospace;font-size:0.58rem;color:var(--muted);}
     .cal-dot{width:5px;height:5px;border-radius:50%;flex-shrink:0;}
-    .cal-empty{color:var(--muted);font-size:0.75rem;padding:.5rem 0;font-style:italic;}
     .cal-sem-total{font-family:'Space Mono',monospace;font-size:0.56rem;color:var(--muted);padding-top:6px;white-space:nowrap;width:100%;}
 
-    footer{text-align:center;padding:1.2rem;color:var(--muted);font-size:0.68rem;border-top:1px solid var(--border);font-family:'Space Mono',monospace;}
-    footer span{color:var(--gold);}
+    /* mobile tab bar — CSS only, no JS resize hook */
+    .mobile-tabs{display:none;border-bottom:1px solid var(--border);background:var(--bg2);}
+    .mobile-tabs > div{display:flex;justify-content:center;gap:4px;padding:6px 1rem;}
 
     @media(max-width:680px){
+      .mobile-tabs{display:block;}
       .stats-row{grid-template-columns:repeat(3,1fr);}
       .dash-grid{grid-template-columns:1fr;}
       .dash-full{grid-column:1/-1;}
@@ -249,7 +257,7 @@
       body{background:#fff!important;color:#111!important;}
       nav,.add-bar,.section-label,.stats-row,.progress-wrap,
       .del-btn,.unassign-all-btn,.add-to-sem-btn,.sem-select,
-      footer,#save-toast,.unassigned-tray,#undo-banner,
+      #save-toast,.unassigned-tray,#undo-banner,
       #milestone-popup,#ms-overlay{display:none!important;}
       .tab-panel{display:block!important;padding:0;}
       #panel-planner{display:block!important;}
@@ -279,23 +287,23 @@
     <div class="badge-total" id="nav-total">— units</div>
     <button class="nav-btn nb-save" onclick="manualSave()" title="Save to browser">💾 Save</button>
     <!-- More dropdown -->
-    <button class="more-btn" id="more-btn" onclick="toggleMore(event)" title="More actions">⋯ More</button>
-    <div class="more-dropdown" id="more-dropdown">
-      <button class="dd-item gold"   onclick="loadDefaultPlan()">📂 Load Default Plan</button>
-      <button class="dd-item purple" onclick="loadDemo()">🔄 Demo Data</button>
+    <button class="more-btn" id="more-btn" onclick="toggleMore(event)" title="More actions" aria-haspopup="true" aria-expanded="false" aria-controls="more-dropdown">⋯ More</button>
+    <div class="more-dropdown" id="more-dropdown" role="menu">
+      <button class="dd-item gold" role="menuitem" onclick="loadDefaultPlan()">📂 Load Default Plan</button>
       <div class="dd-sep"></div>
-      <button class="dd-item blue"   onclick="exportJSON()">⬇ Export JSON</button>
-      <label  class="dd-item blue"   style="cursor:pointer">⬆ Import JSON<input type="file" accept=".json" id="import-file" style="display:none" onchange="importJSON(this)"></label>
-      <button class="dd-item teal"   onclick="exportCSV()">📊 Export CSV</button>
+      <button class="dd-item blue" role="menuitem" onclick="exportJSON()">⬇ Export JSON</button>
+      <button class="dd-item blue" role="menuitem" onclick="document.getElementById('import-file').click()">⬆ Import JSON</button>
+      <button class="dd-item teal" role="menuitem" onclick="exportCSV()">📊 Export CSV</button>
       <div class="dd-sep"></div>
-      <button class="dd-item red"    onclick="exportPDF()">📄 PDF / Print</button>
+      <button class="dd-item red" role="menuitem" onclick="exportPDF()">📄 PDF / Print</button>
     </div>
-    <button class="theme-toggle" id="theme-toggle"><span class="theme-icon">🌙</span></button>
+    <input type="file" accept=".json" id="import-file" style="display:none" onchange="importJSON(this)">
+    <button class="theme-toggle" id="theme-toggle" type="button" aria-label="Switch between light and dark theme" title="Toggle theme"><span class="theme-icon" aria-hidden="true">🌙</span></button>
   </div>
 </nav>
 
 <!-- ── MOBILE TAB BAR ── -->
-<div style="display:none;border-bottom:1px solid var(--border);background:var(--bg2);" id="mobile-tabs">
+<div class="mobile-tabs" id="mobile-tabs">
   <div style="display:flex;justify-content:center;gap:4px;padding:6px 1rem;">
     <button class="tab-btn active" data-tab="dashboard" onclick="switchTab('dashboard')">📊 Dashboard</button>
     <button class="tab-btn" data-tab="planner" onclick="switchTab('planner')">📋 Planner</button>
@@ -324,9 +332,9 @@
       <div class="progress-track"><div class="progress-fill" id="prog-fill" style="width:0%"></div></div>
     </div>
     <div class="progress-goal-row">
-      <div class="progress-note" id="prog-note">0 / 120 planned</div>
+      <div class="progress-note" id="prog-note">0 / 63 planned</div>
       <div class="progress-note">
-        Goal: <input class="progress-goal-edit" id="goal-units" type="number" value="120" min="1" max="999">
+        Goal: <input class="progress-goal-edit" id="goal-units" type="number" value="63" min="1" max="999">
         units &nbsp;·&nbsp; ✅ Done: <span id="prog-done" style="color:var(--green);font-family:'Space Mono',monospace;font-size:.62rem;">0</span>
       </div>
     </div>
@@ -346,6 +354,7 @@
     <div class="stat-card"><div class="stat-label">Courses</div><div class="stat-val" id="stat-courses">0</div><div class="stat-sub">in plan</div></div>
     <div class="stat-card green"><div class="stat-label">Semesters</div><div class="stat-val" id="stat-sems">0</div><div class="stat-sub">active</div></div>
     <div class="stat-card purple" title="Average units per active semester"><div class="stat-label">Avg Load</div><div class="stat-val" id="stat-avg">0</div><div class="stat-sub">units/sem</div></div>
+    <div class="stat-card red"><div class="stat-label">Remaining</div><div class="stat-val" id="stat-left">0</div><div class="stat-sub">units to goal</div></div>
   </div>
 
   <div class="section-label">🏆 Milestones</div>
@@ -383,11 +392,11 @@
   <div class="section-label">➕ Add Course</div>
   <div class="add-bar">
     <div class="add-bar-label">New course</div>
-    <input type="text"   id="new-code"   placeholder="Code (e.g. CIS 212)">
-    <input type="text"   id="new-title"  placeholder="Course title">
-    <input type="number" id="new-units"  placeholder="Units" min="0.5" max="30" step="0.5" value="3">
-    <select id="new-sem"></select>
-    <select id="new-status">
+    <input type="text"   id="new-code"   placeholder="Code (e.g. CIS 212)" aria-label="New course code">
+    <input type="text"   id="new-title"  placeholder="Course title" aria-label="New course title">
+    <input type="number" id="new-units"  placeholder="Units" min="0.5" max="30" step="0.5" value="3" aria-label="New course units">
+    <select id="new-sem" aria-label="New course semester"></select>
+    <select id="new-status" aria-label="New course status">
       <option value="planned">Planned</option>
       <option value="in-progress">In Progress</option>
       <option value="done">Done</option>
@@ -462,19 +471,40 @@
 </div>
 
 <script>
-/* ── SEMESTERS ── */
+/* ── SEMESTERS (fixed list — deliberately independent of today's date) ── */
+const TERM_YEARS=[2025,2026,2027,2028];
+const TERM_KINDS=[
+  {prefix:'sp',name:'Spring',color:'#3b9eff'},
+  {prefix:'su',name:'Summer',color:'#f9a825'},
+  {prefix:'fa',name:'Fall',color:'#80c44a'},
+  {prefix:'wi',name:'Winter',color:'#a78bfa'},
+];
 function buildSemesters(){
-  const y0=new Date().getFullYear()-1,seen=new Set(),list=[];
-  for(let y=y0;y<=y0+7;y++){
-    [{id:`sp${y}`,label:`${y} Spring`,color:'#3b9eff'},{id:`su${y}`,label:`${y} Summer`,color:'#f9a825'},
-     {id:`fa${y}`,label:`${y} Fall`,color:'#80c44a'},{id:`wi${y+1}`,label:`${y+1} Winter`,color:'#a78bfa'}]
-    .forEach(s=>{if(!seen.has(s.id)){seen.add(s.id);list.push(s);}});
-  }
+  const list=[];
+  TERM_YEARS.forEach(y=>TERM_KINDS.forEach(k=>{
+    const year=k.prefix==='wi'?y+1:y;          /* Winter belongs to the next calendar year */
+    const id=k.prefix+year;
+    if(!list.some(s=>s.id===id))list.push({id,label:`${year} ${k.name}`,color:k.color});
+  }));
   return list;
 }
 const SEMESTERS=buildSemesters();
+/* Safety net: never hide a course whose term is outside the fixed list. */
+function ensureSemesters(ids){
+  ids.forEach(id=>{
+    if(!id||id==='unassigned')return;
+    if(!SEMESTERS.some(s=>s.id===id))SEMESTERS.push({id,label:id,color:'#22d3a5'});
+  });
+}
 function getSem(id){return SEMESTERS.find(s=>s.id===id)||null;}
 function uid(){return 'c'+Math.random().toString(36).substring(2,11);}
+
+/* ── SHARED LOOKUPS (single source; used by dashboard + calendar) ── */
+const STATUSES=['planned','in-progress','done'];
+const CATS=['other','ge','major','elective'];
+const STATUS_COLORS={done:'#80c44a','in-progress':'#f9a825',planned:'#6b7280'};
+const CAT_COLORS={ge:'#a78bfa',major:'#3b9eff',elective:'#22d3a5',other:'#6b7280'};
+const CAT_LABELS={ge:'GE',major:'Major',elective:'Elective',other:'Other'};
 
 const DEFAULT_COURSES=[
   /* 2026 Winter — transferred in, Taken */
@@ -506,14 +536,6 @@ const DEFAULT_COURSES=[
   {id:uid(),code:'CIS 213',     title:'A+ Software Cert. Prep',        units:3,sem:'sp2027',status:'in-progress',cat:'major', notes:'A+ Core 2'},
 ];
 
-let courses=loadCourses(), goalUnits=loadGoal();
-let _lastDeleted=null,_undoTimer=null;
-
-/* ── BUG FIX #3: persist milestone pct in localStorage ── */
-let _prevMilestonePct=loadMilestonePct();
-function loadMilestonePct(){try{return parseInt(localStorage.getItem('itsec_ms_pct_v10'))||0;}catch(e){return 0;}}
-function saveMilestonePct(p){try{localStorage.setItem('itsec_ms_pct_v10',p);}catch(e){}}
-
 const MILESTONES=[
   {pct:25,emoji:'🌱',title:'25% Complete',sub:'Solid start — keep the momentum.'},
   {pct:50,emoji:'⚡',title:'Halfway There!',sub:"50% done. You're well past the halfway point."},
@@ -521,28 +543,75 @@ const MILESTONES=[
   {pct:100,emoji:'🎓',title:'Goal Achieved!',sub:'100%! Degree goal reached. Congratulations.'},
 ];
 
-/* ── STORAGE ── */
+/* ── STORAGE ──
+   Edits live in localStorage so they survive a reload. The key carries
+   SCHEMA_VERSION; older keys are still read once, so nothing is lost. */
+const SCHEMA_VERSION=11;
+const LS_BASE={planner:'itsec_planner',goal:'itsec_goal',ms:'itsec_ms_pct',theme:'itsec_theme',removed:'itsec_removed'};
+const LS_SUFFIXES=['_v11','_v10','_v9','_v8','_v7'];
+function lsRead(base){
+  for(const suffix of LS_SUFFIXES){
+    try{const v=localStorage.getItem(base+suffix);if(v!==null)return v;}catch(e){}
+  }
+  return null;
+}
+function lsWrite(base,val){
+  try{localStorage.setItem(base+'_v'+SCHEMA_VERSION,val);return true;}catch(e){return false;}
+}
+function loadRemoved(){
+  try{const s=lsRead(LS_BASE.removed);const a=s?JSON.parse(s):[];return new Set(Array.isArray(a)?a:[]);}catch(e){return new Set();}
+}
+function saveRemoved(set){lsWrite(LS_BASE.removed,JSON.stringify([...set]));}
+
+/* Courses deleted on purpose — the merge below must not resurrect them. */
+let removedCodes=loadRemoved();
+
 function loadCourses(){
-  try{const s=localStorage.getItem('itsec_planner_v10');if(s){const a=JSON.parse(s);if(Array.isArray(a))return a.map(c=>({status:'planned',cat:'other',notes:'',...c}));}}catch(e){}
-  return DEFAULT_COURSES.map(c=>({...c}));
+  let saved=null;
+  try{
+    const s=lsRead(LS_BASE.planner);
+    if(s){
+      const a=JSON.parse(s);
+      if(Array.isArray(a))saved=a.filter(c=>c&&typeof c==='object').map(c=>({status:'planned',cat:'other',notes:'',...c}));
+    }
+  }catch(e){}
+  if(!saved)return DEFAULT_COURSES.filter(d=>!removedCodes.has(d.code.trim().toLowerCase())).map(c=>({...c}));
+  /* Merge courses that were added to the default plan after this visitor saved. */
+  const have=new Set(saved.map(c=>String(c.code||'').trim().toLowerCase()));
+  DEFAULT_COURSES.forEach(d=>{
+    const key=d.code.trim().toLowerCase();
+    if(!have.has(key)&&!removedCodes.has(key)){saved.push({...d});have.add(key);}
+  });
+  return saved;
 }
-/* BUG FIX #1: saveCourses does NOT call showToast — toast only from manualSave */
 function saveCourses(silent=false){
-  try{localStorage.setItem('itsec_planner_v10',JSON.stringify(courses));}catch(e){}
-  if(!silent) silentDashUpdate();
+  if(!lsWrite(LS_BASE.planner,JSON.stringify(courses)))showToast('⚠️ Save failed — storage full or private mode');
+  if(!silent)silentDashUpdate();
 }
-function loadGoal(){try{return parseInt(localStorage.getItem('itsec_goal_v10'))||120;}catch(e){return 120;}}
-function saveGoal(v){try{localStorage.setItem('itsec_goal_v10',v);}catch(e){}}
+/* Default goal = units actually in the plan (was a hardcoded 120). */
+const DEFAULT_GOAL=DEFAULT_COURSES.reduce((a,c)=>a+(Number(c.units)||0),0);
+function loadGoal(){
+  const n=parseInt(lsRead(LS_BASE.goal));
+  /* 120 was the old hardcoded default; the plan is 63 units, so treat it as unset. */
+  if(!n||n<1||n===120)return DEFAULT_GOAL;
+  return n;
+}
+function saveGoal(v){lsWrite(LS_BASE.goal,String(v));}
+
+let courses=loadCourses(), goalUnits=loadGoal();
+ensureSemesters(courses.map(c=>c.sem));
+let _lastDeleted=null,_undoTimer=null;
+
+function loadMilestonePct(){const n=parseInt(lsRead(LS_BASE.ms));return n||0;}
+function saveMilestonePct(p){lsWrite(LS_BASE.ms,String(p));}
+let _prevMilestonePct=loadMilestonePct();
+let _firstStatsRender=true;
 
 function loadDefaultPlan(){
-  if(!confirm('Load the default 21-course IT Cybersecurity plan?\nThis replaces your current plan.'))return;
-  courses=DEFAULT_COURSES.map(c=>({...c}));saveCourses();render();
-}
-function loadDemo(){
-  if(!confirm('Load demo data? This applies sample statuses and replaces your current plan.'))return;
-  courses=DEFAULT_COURSES.map(c=>({...c,
-    status:['sp2026','su2026'].includes(c.sem)?'done':c.sem==='fa2026'?'in-progress':'planned'
-  }));
+  if(!confirm(`Load the default ${DEFAULT_COURSES.length}-course plan?\nThis replaces your current plan.`))return;
+  courses=DEFAULT_COURSES.map(c=>({...c}));
+  removedCodes=new Set();saveRemoved(removedCodes);
+  ensureSemesters(courses.map(c=>c.sem));
   saveCourses();render();
 }
 
@@ -570,8 +639,16 @@ function switchTab(tab){
 }
 
 /* ── MORE DROPDOWN ── */
-function toggleMore(e){e.stopPropagation();document.getElementById('more-dropdown').classList.toggle('open');}
-function closeMore(){document.getElementById('more-dropdown').classList.remove('open');}
+function toggleMore(e){
+  e.stopPropagation();
+  const dd=document.getElementById('more-dropdown');
+  const open=dd.classList.toggle('open');
+  document.getElementById('more-btn').setAttribute('aria-expanded',open?'true':'false');
+}
+function closeMore(){
+  document.getElementById('more-dropdown').classList.remove('open');
+  document.getElementById('more-btn').setAttribute('aria-expanded','false');
+}
 document.addEventListener('click',()=>{
   closeMore();
   document.querySelectorAll('.cal-chip.tip-open').forEach(ch=>ch.classList.remove('tip-open'));
@@ -581,9 +658,26 @@ window.addEventListener('scroll',closeMore,{passive:true});
 /* ── EXPORT / IMPORT ── */
 function exportJSON(){
   closeMore();
-  const data={version:6,goal:goalUnits,exportedAt:new Date().toISOString(),courses};
+  const data={version:SCHEMA_VERSION,goal:goalUnits,exportedAt:new Date().toISOString(),courses};
   const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
   const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='it_planner_backup.json';a.click();
+}
+/* Coerce imported JSON into a valid course record — never trust the file. */
+function normalizeImport(raw){
+  const out=[];
+  raw.forEach(c=>{
+    if(!c||typeof c!=='object')return;
+    const code=String(c.code||'').trim();
+    const title=String(c.title||'').trim();
+    let units=Number(c.units);
+    if(!isFinite(units)||units<0.5||units>30)units=3;
+    const status=STATUSES.includes(c.status)?c.status:'planned';
+    const cat=CATS.includes(c.cat)?c.cat:'other';
+    const sem=String(c.sem||'unassigned').trim()||'unassigned';
+    if(!code&&!title)return;
+    out.push({id:uid(),code:code||title,title:title||code,units,status,cat,sem,notes:String(c.notes||'')});
+  });
+  return out;
 }
 function importJSON(input){
   closeMore();
@@ -592,12 +686,14 @@ function importJSON(input){
   reader.onload=e=>{
     try{
       const data=JSON.parse(e.target.result);
-      if(typeof data.version!=='number')throw new Error('missing version');
       if(!data.courses||!Array.isArray(data.courses))throw new Error('invalid courses');
-      if(data.version<6&&!confirm(`Backup is version ${data.version} (current: 6). Import anyway?`)){input.value='';return;}
-      if(confirm(`Import ${data.courses.length} courses? Replaces current plan.`)){
-        courses=data.courses.map(c=>({status:'planned',cat:'other',notes:'',...c}));
-        if(data.goal){goalUnits=data.goal;document.getElementById('goal-units').value=goalUnits;saveGoal(goalUnits);}
+      const list=normalizeImport(data.courses);
+      if(!list.length)throw new Error('no usable courses');
+      if(confirm(`Import ${list.length} courses? Replaces current plan.`)){
+        courses=list;
+        ensureSemesters(courses.map(c=>c.sem));
+        removedCodes=new Set();saveRemoved(removedCodes);
+        if(data.goal){goalUnits=parseInt(data.goal)||DEFAULT_GOAL;document.getElementById('goal-units').value=goalUnits;saveGoal(goalUnits);}
         saveCourses();render();
       }
     }catch(err){alert('Import failed: '+err.message);}
@@ -639,6 +735,8 @@ function scheduleUndo(course){
 }
 function undoDelete(){
   if(!_lastDeleted)return;
+  removedCodes.delete(String(_lastDeleted.code||'').trim().toLowerCase());
+  saveRemoved(removedCodes);
   courses.push(_lastDeleted);_lastDeleted=null;
   clearTimeout(_undoTimer);
   document.getElementById('undo-banner').classList.remove('show');
@@ -725,7 +823,11 @@ function renderTableBody(tbody,list){
     });
     tr.querySelector('.del-btn').addEventListener('click',()=>{
       const idx=courses.findIndex(x=>x.id===course.id);if(idx===-1)return;
-      const removed=courses.splice(idx,1)[0];scheduleUndo(removed);saveCourses();render();
+      const removed=courses.splice(idx,1)[0];
+      /* remember deletions of planned courses so merge does not bring them back */
+      const key=String(removed.code||'').trim().toLowerCase();
+      if(DEFAULT_COURSES.some(d=>d.code.trim().toLowerCase()===key)){removedCodes.add(key);saveRemoved(removedCodes);}
+      scheduleUndo(removed);saveCourses();render();
     });
     frag.appendChild(tr);
   });
@@ -797,7 +899,7 @@ function renderPlanner(){
 
 /* ── RENDER STATS (lightweight, no full re-render) ── */
 function renderStats(){
-  const goal=goalUnits||120;
+  const goal=goalUnits||DEFAULT_GOAL;
   let totalUnits=0,doneUnits=0,inProg=0,planned=0,activeSems=0;
   const catMap={ge:0,major:0,elective:0,other:0};
   const semUnitMap={};
@@ -817,12 +919,16 @@ function renderStats(){
   document.getElementById('stat-courses').textContent=courses.length;
   document.getElementById('stat-sems').textContent=activeSems;
   document.getElementById('stat-avg').textContent=activeSems?(totalUnits/activeSems).toFixed(1):0;
+  document.getElementById('stat-left').textContent=Math.max(0,goal-doneUnits);
   document.getElementById('nav-total').textContent=totalUnits+' units';
   document.getElementById('prog-fill').style.width=pct+'%';
   document.getElementById('prog-pct').textContent=pct+'%';
   document.getElementById('prog-note').textContent=`${totalUnits} / ${goal} planned`;
   document.getElementById('prog-done').textContent=doneUnits+' units';
-  checkMilestone(pct);
+  /* First paint: record the milestone baseline silently — no popup for a page
+     that simply loads at 67%. Popups only fire on progress made this session. */
+  if(_firstStatsRender){_firstStatsRender=false;_prevMilestonePct=pct;saveMilestonePct(pct);}
+  else checkMilestone(pct);
   return {totalUnits,doneUnits,inProg,planned,activeSems,catMap,semUnitMap,pct,goal};
 }
 
@@ -832,7 +938,7 @@ function renderDashboard(){
   const total=doneUnits+inProg+planned||1;
 
   // milestone badges
-  const goal=goalUnits||120;
+  const goal=goalUnits||DEFAULT_GOAL;
   const pct=Math.min(100,Math.round(doneUnits/goal*100));
   const ml=document.getElementById('milestone-list');ml.innerHTML='';
   const mFrag=document.createDocumentFragment();
@@ -864,13 +970,11 @@ function renderDashboard(){
   dl.innerHTML=dlHtml;
 
   // Category bars
-  const catColors={ge:'#a78bfa',major:'#3b9eff',elective:'#22d3a5',other:'#6b7280'};
-  const catLabels={ge:'GE',major:'Major',elective:'Elective',other:'Other'};
   const catMax=Math.max(...Object.values(catMap),1);
   const catDiv=document.getElementById('cat-bars');catDiv.innerHTML='';
   let catHtml='';
   Object.entries(catMap).filter(([,v])=>v>0).forEach(([k,v])=>{
-    catHtml+=`<div class="bar-row"><div class="bar-label">${catLabels[k]}</div><div class="bar-track"><div class="bar-fill" style="width:${v/catMax*100}%;background:${catColors[k]}"></div></div><div class="bar-val">${v}u</div></div>`;
+    catHtml+=`<div class="bar-row"><div class="bar-label">${CAT_LABELS[k]||k}</div><div class="bar-track"><div class="bar-fill" style="width:${v/catMax*100}%;background:${CAT_COLORS[k]||'#6b7280'}"></div></div><div class="bar-val">${v}u</div></div>`;
   });
   catDiv.innerHTML=catHtml||'<div style="font-size:.72rem;color:var(--muted)">No data yet</div>';
 
@@ -898,9 +1002,6 @@ function renderCalendar(){
   document.getElementById('cal-empty').style.display=semsWithData.length?'none':'';
   if(!semsWithData.length)return;
 
-  const statusColors={done:'#80c44a','in-progress':'#f9a825',planned:'#6b7280'};
-  const catColors={ge:'#a78bfa',major:'#3b9eff',elective:'#22d3a5',other:'#6b7280'};
-
   const yearMap={};
   semsWithData.forEach(s=>{const yr=s.label.split(' ')[0];if(!yearMap[yr])yearMap[yr]=[];yearMap[yr].push(s);});
 
@@ -918,8 +1019,11 @@ function renderCalendar(){
       const chips=document.createElement('div');chips.className='cal-courses';
       list.forEach(c=>{
         const chip=document.createElement('div');chip.className='cal-chip';
-        const dotColor=statusColors[c.status||'planned'];
-        const codeColor=catColors[c.cat||'other'];
+        chip.tabIndex=0;
+        chip.setAttribute('role','button');
+        chip.setAttribute('aria-label',`${c.code} — ${c.title}, ${c.units} units, ${c.status}`);
+        const dotColor=STATUS_COLORS[c.status||'planned']||STATUS_COLORS.planned;
+        const codeColor=CAT_COLORS[c.cat||'other']||CAT_COLORS.other;
         const notesLine=c.notes?`\n📝 ${c.notes}`:'';
         chip.innerHTML=`
           <span class="cal-dot" style="background:${dotColor}"></span>
@@ -929,12 +1033,18 @@ function renderCalendar(){
           <span class="cal-units">${c.units}u</span>
           <div class="cal-tooltip">${esc(c.code)} — ${esc(c.title)}<br>${c.units} units · ${c.status} · ${c.cat||'other'}${notesLine?'<br>'+esc(c.notes):''}</div>
         `;
-        chip.addEventListener('click',e=>{
+        const toggleTip=e=>{
           const isOpen=chip.classList.contains('tip-open');
           document.querySelectorAll('.cal-chip.tip-open').forEach(ch=>ch.classList.remove('tip-open'));
           if(!isOpen)chip.classList.add('tip-open');
-          e.stopPropagation();
+          if(e)e.stopPropagation();
+        };
+        chip.addEventListener('click',toggleTip);
+        chip.addEventListener('keydown',e=>{
+          if(e.key==='Enter'||e.key===' '){e.preventDefault();toggleTip(e);}
+          else if(e.key==='Escape')chip.classList.remove('tip-open');
         });
+        chip.addEventListener('blur',()=>chip.classList.remove('tip-open'));
         chips.appendChild(chip);
       });
       const tot=document.createElement('div');tot.className='cal-sem-total';tot.textContent=`${semUnits}u total`;
@@ -974,6 +1084,7 @@ function addCourse(){
   if(dup&&!confirm(`"${code}" already exists (${getSem(dup.sem)?.label||dup.sem}). Add anyway?`))return;
 
   courses.push({id:uid(),code,title,units:parseFloat(unitsEl.value),sem,status,cat,notes});
+  removedCodes.delete(code.toLowerCase());saveRemoved(removedCodes);
   saveCourses();render();
   codeEl.value='';titleEl.value='';unitsEl.value='3';document.getElementById('new-notes').value='';codeEl.focus();
 }
@@ -990,13 +1101,16 @@ document.getElementById('goal-units').addEventListener('change',function(){
 // Theme
 const themeToggle=document.getElementById('theme-toggle');
 const themeIcon=themeToggle.querySelector('.theme-icon');
-function setTheme(light){document.body.classList.toggle('light',light);themeIcon.textContent=light?'☀️':'🌙';try{localStorage.setItem('itsec_theme_v10',light?'light':'dark');}catch(e){}}
+function setTheme(light){
+  document.body.classList.toggle('light',light);
+  themeIcon.textContent=light?'☀️':'🌙';
+  document.getElementById('theme-toggle').setAttribute('aria-pressed',light?'true':'false');
+  lsWrite(LS_BASE.theme,light?'light':'dark');
+}
 themeToggle.addEventListener('click',()=>setTheme(!document.body.classList.contains('light')));
-try{if(localStorage.getItem('itsec_theme_v10')!=='dark')setTheme(true);}catch(e){}
+/* First visit opens in the light (day) theme; an explicit dark choice sticks. */
+if(lsRead(LS_BASE.theme)!=='dark')setTheme(true);
 
-if(window.innerWidth<=680)document.getElementById('mobile-tabs').style.display='block';
-
-render();
 switchTab('planner');
 </script>
 </body>
