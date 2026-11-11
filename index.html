@@ -492,11 +492,21 @@ function buildSemesters(){
   return list;
 }
 const SEMESTERS=buildSemesters();
-/* Safety net: never hide a course whose term is outside the fixed list. */
+/* Term ids are the ONLY thing that may appear in the DOM / CSS selectors.
+   Anything that does not match sp|su|fa|wi + 4 digits is rejected. */
+const TERM_ID=/^(sp|su|fa|wi)(\d{4})$/;
+const TERM_NAME={sp:'Spring',su:'Summer',fa:'Fall',wi:'Winter'};
+function isValidTerm(id){return id==='unassigned'||TERM_ID.test(String(id||''));}
+/* Safety net: never hide a course whose term is outside the fixed list.
+   Labels are rebuilt from the validated id — never taken from input text. */
 function ensureSemesters(ids){
-  ids.forEach(id=>{
-    if(!id||id==='unassigned')return;
-    if(!SEMESTERS.some(s=>s.id===id))SEMESTERS.push({id,label:id,color:'#22d3a5'});
+  ids.forEach(raw=>{
+    const id=String(raw||'').trim();
+    const m=id.match(TERM_ID);
+    if(!m)return;
+    if(!SEMESTERS.some(s=>s.id===id)){
+      SEMESTERS.push({id,label:`${m[2]} ${TERM_NAME[m[1]]}`,color:'#22d3a5'});
+    }
   });
 }
 function getSem(id){return SEMESTERS.find(s=>s.id===id)||null;}
@@ -575,7 +585,12 @@ function loadCourses(){
     const s=lsRead(LS_BASE.planner);
     if(s){
       const a=JSON.parse(s);
-      if(Array.isArray(a))saved=a.filter(c=>c&&typeof c==='object').map(c=>({status:'planned',cat:'other',notes:'',...c}));
+      if(Array.isArray(a))saved=a.filter(c=>c&&typeof c==='object').map(c=>{
+        const course={status:'planned',cat:'other',notes:'',...c};
+        /* stored data can be hand-edited too: keep only known-shaped term ids */
+        course.sem=isValidTerm(String(course.sem||''))?String(course.sem).trim():'unassigned';
+        return course;
+      });
     }
   }catch(e){}
   if(!saved)return DEFAULT_COURSES.filter(d=>!removedCodes.has(d.code.trim().toLowerCase())).map(c=>({...c}));
@@ -676,7 +691,10 @@ function normalizeImport(raw){
     if(!isFinite(units)||units<0.5||units>30)units=3;
     const status=STATUSES.includes(c.status)?c.status:'planned';
     const cat=CATS.includes(c.cat)?c.cat:'other';
-    const sem=String(c.sem||'unassigned').trim()||'unassigned';
+    /* Imported term must be a known-shaped id; anything else falls back to unassigned
+       so attacker-supplied text can never reach the DOM. */
+    let sem=String(c.sem||'').trim();
+    if(!isValidTerm(sem))sem='unassigned';
     if(!code&&!title)return;
     out.push({id:uid(),code:code||title,title:title||code,units,status,cat,sem,notes:String(c.notes||'')});
   });
@@ -861,10 +879,10 @@ function renderPlanner(){
     const block=document.createElement('div');block.className='semester-block';
     block.innerHTML=`
       <div class="sem-header">
-        <div class="sem-title"><span class="sem-dot" style="background:${sem.color}"></span>${sem.label}</div>
+        <div class="sem-title"><span class="sem-dot" style="background:${sem.color}"></span>${esc(sem.label)}</div>
         <div class="sem-right">
           <div class="sem-units-badge">${semUnits} units${semDone>0?' · ✅ '+semDone+' done':''} · ${list.length} course${list.length!==1?'s':''}</div>
-          <button class="unassign-all-btn" data-sem="${sem.id}">📤 Unassign All</button>
+          <button class="unassign-all-btn" data-sem="${esc(sem.id)}">📤 Unassign All</button>
         </div>
       </div>
       <div class="table-wrap"><table>
@@ -874,9 +892,9 @@ function renderPlanner(){
           <th style="width:86px">Status</th><th style="width:78px">Category</th>
           <th style="width:136px">Move to</th><th style="width:30px"></th>
         </tr></thead>
-        <tbody id="tbody-${sem.id}"></tbody>
+        <tbody id="tbody-${esc(sem.id)}"></tbody>
       </table></div>
-      <button class="add-to-sem-btn" data-sem="${sem.id}">+ Add course to ${sem.label}</button>
+      <button class="add-to-sem-btn" data-sem="${esc(sem.id)}">+ Add course to ${esc(sem.label)}</button>
     `;
     frag.appendChild(block);
   });
