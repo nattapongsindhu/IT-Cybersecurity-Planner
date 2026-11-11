@@ -470,10 +470,6 @@ function buildSemesters(){
      {id:`fa${y}`,label:`${y} Fall`,color:'#80c44a'},{id:`wi${y+1}`,label:`${y+1} Winter`,color:'#a78bfa'}]
     .forEach(s=>{if(!seen.has(s.id)){seen.add(s.id);list.push(s);}});
   }
-  /* transferred-in credits shown above the regular terms */
-  const gcc={id:'gcc2026',label:'2026 GCC-transferred',color:'#22d3a5'};
-  const i=list.findIndex(s=>s.id==='sp2026');
-  if(i===-1)list.unshift(gcc);else list.splice(i,0,gcc);
   return list;
 }
 const SEMESTERS=buildSemesters();
@@ -481,9 +477,9 @@ function getSem(id){return SEMESTERS.find(s=>s.id===id)||null;}
 function uid(){return 'c'+Math.random().toString(36).substring(2,11);}
 
 const DEFAULT_COURSES=[
-  /* 2026 GCC-transferred — Taken */
-  {id:uid(),code:'MUSIC 121',   title:'History of Rock Music',         units:3,sem:'gcc2026',status:'done',cat:'ge',    notes:''},
-  {id:uid(),code:'SPHC 101',    title:'Public Speaking',               units:3,sem:'gcc2026',status:'done',cat:'ge',    notes:''},
+  /* 2026 Winter — transferred in, Taken */
+  {id:uid(),code:'MUSIC 121',   title:'History of Rock Music',         units:3,sem:'wi2026',status:'done',cat:'ge',    notes:''},
+  {id:uid(),code:'SPHC 101',    title:'Public Speaking',               units:3,sem:'wi2026',status:'done',cat:'ge',    notes:''},
   /* 2026 Spring — Taken */
   {id:uid(),code:'ANTHRO 102',  title:'Human Ways Of Life',            units:3,sem:'sp2026',status:'done',   cat:'ge',    notes:''},
   {id:uid(),code:'CS 101',      title:'Intro to Comp Science',         units:3,sem:'sp2026',status:'done',   cat:'major', notes:''},
@@ -515,8 +511,8 @@ let _lastDeleted=null,_undoTimer=null;
 
 /* ── BUG FIX #3: persist milestone pct in localStorage ── */
 let _prevMilestonePct=loadMilestonePct();
-function loadMilestonePct(){try{return parseInt(localStorage.getItem('itsec_ms_pct_v9'))||0;}catch(e){return 0;}}
-function saveMilestonePct(p){try{localStorage.setItem('itsec_ms_pct_v9',p);}catch(e){}}
+function loadMilestonePct(){try{return parseInt(localStorage.getItem('itsec_ms_pct_v10'))||0;}catch(e){return 0;}}
+function saveMilestonePct(p){try{localStorage.setItem('itsec_ms_pct_v10',p);}catch(e){}}
 
 const MILESTONES=[
   {pct:25,emoji:'🌱',title:'25% Complete',sub:'Solid start — keep the momentum.'},
@@ -527,16 +523,16 @@ const MILESTONES=[
 
 /* ── STORAGE ── */
 function loadCourses(){
-  try{const s=localStorage.getItem('itsec_planner_v9');if(s){const a=JSON.parse(s);if(Array.isArray(a))return a.map(c=>({status:'planned',cat:'other',notes:'',...c}));}}catch(e){}
+  try{const s=localStorage.getItem('itsec_planner_v10');if(s){const a=JSON.parse(s);if(Array.isArray(a))return a.map(c=>({status:'planned',cat:'other',notes:'',...c}));}}catch(e){}
   return DEFAULT_COURSES.map(c=>({...c}));
 }
 /* BUG FIX #1: saveCourses does NOT call showToast — toast only from manualSave */
 function saveCourses(silent=false){
-  try{localStorage.setItem('itsec_planner_v9',JSON.stringify(courses));}catch(e){}
+  try{localStorage.setItem('itsec_planner_v10',JSON.stringify(courses));}catch(e){}
   if(!silent) silentDashUpdate();
 }
-function loadGoal(){try{return parseInt(localStorage.getItem('itsec_goal_v9'))||120;}catch(e){return 120;}}
-function saveGoal(v){try{localStorage.setItem('itsec_goal_v9',v);}catch(e){}}
+function loadGoal(){try{return parseInt(localStorage.getItem('itsec_goal_v10'))||120;}catch(e){return 120;}}
+function saveGoal(v){try{localStorage.setItem('itsec_goal_v10',v);}catch(e){}}
 
 function loadDefaultPlan(){
   if(!confirm('Load the default 21-course IT Cybersecurity plan?\nThis replaces your current plan.'))return;
@@ -994,9 +990,9 @@ document.getElementById('goal-units').addEventListener('change',function(){
 // Theme
 const themeToggle=document.getElementById('theme-toggle');
 const themeIcon=themeToggle.querySelector('.theme-icon');
-function setTheme(light){document.body.classList.toggle('light',light);themeIcon.textContent=light?'☀️':'🌙';try{localStorage.setItem('itsec_theme_v9',light?'light':'dark');}catch(e){}}
+function setTheme(light){document.body.classList.toggle('light',light);themeIcon.textContent=light?'☀️':'🌙';try{localStorage.setItem('itsec_theme_v10',light?'light':'dark');}catch(e){}}
 themeToggle.addEventListener('click',()=>setTheme(!document.body.classList.contains('light')));
-try{if(localStorage.getItem('itsec_theme_v9')!=='dark')setTheme(true);}catch(e){}
+try{if(localStorage.getItem('itsec_theme_v10')!=='dark')setTheme(true);}catch(e){}
 
 if(window.innerWidth<=680)document.getElementById('mobile-tabs').style.display='block';
 
