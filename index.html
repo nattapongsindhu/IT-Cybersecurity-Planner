@@ -479,25 +479,31 @@ function getSem(id){return SEMESTERS.find(s=>s.id===id)||null;}
 function uid(){return 'c'+Math.random().toString(36).substring(2,11);}
 
 const DEFAULT_COURSES=[
-  {id:uid(),code:'ANTHRO 102',  title:'Human Ways Of Life',            units:3,sem:'sp2026',status:'planned',cat:'ge',    notes:''},
-  {id:uid(),code:'CS 101',      title:'Intro to Comp Sci',             units:3,sem:'sp2026',status:'planned',cat:'major', notes:''},
-  {id:uid(),code:'ENGL C1000',  title:'Academic Reading & Writing',    units:3,sem:'sp2026',status:'planned',cat:'ge',    notes:''},
-  {id:uid(),code:'HEALTH 101',  title:'Intro Public Health',           units:3,sem:'sp2026',status:'planned',cat:'ge',    notes:''},
-  {id:uid(),code:'STAT C1000',  title:'Intro to Statistics',           units:4,sem:'su2026',status:'planned',cat:'ge',    notes:''},
-  {id:uid(),code:'POLS C1000',  title:'American Government & Politics',units:3,sem:'su2026',status:'planned',cat:'ge',    notes:''},
-  {id:uid(),code:'ASIAN 001',   title:'Asian American Hist',           units:3,sem:'fa2026',status:'planned',cat:'ge',    notes:''},
-  {id:uid(),code:'MATH 260',    title:'Precalculus',                   units:5,sem:'fa2026',status:'planned',cat:'major', notes:'Prereq for PHYSICS 101'},
-  {id:uid(),code:'PHYSICS 101', title:'Phys Engineers/Sci I',          units:5,sem:'fa2026',status:'planned',cat:'major', notes:'Req: MATH 260'},
-  {id:uid(),code:'CIS 212',     title:'A+ Cert Prep HW',               units:3,sem:'wi2027',status:'planned',cat:'major', notes:'A+ Core 1'},
-  {id:uid(),code:'CIS 213',     title:'A+ Operating Systems',          units:3,sem:'wi2027',status:'planned',cat:'major', notes:'A+ Core 2'},
-  {id:uid(),code:'CIS 112',     title:'Operating Systems',             units:3,sem:'sp2027',status:'planned',cat:'major', notes:''},
-  {id:uid(),code:'CIS 210',     title:'Intro to Computer Networking',  units:3,sem:'sp2027',status:'planned',cat:'major', notes:'Prereq for CIS 214'},
-  {id:uid(),code:'CIS 214',     title:'Intro to Netwk Plus',           units:3,sem:'sp2027',status:'planned',cat:'major', notes:'Req: CIS 210'},
-  {id:uid(),code:'CS 119',      title:'Python Programming',            units:3,sem:'sp2027',status:'planned',cat:'major', notes:'Req: CS 101'},
-  {id:uid(),code:'CIS 166',     title:'Computer Forensics',            units:3,sem:'fa2027',status:'planned',cat:'major', notes:''},
-  {id:uid(),code:'CIS 170',     title:'Intro to Ethical Hacking',      units:3,sem:'fa2027',status:'planned',cat:'major', notes:'Req: CIS 112'},
-  {id:uid(),code:'CIS 211',     title:'Security+ Preparation',         units:3,sem:'fa2027',status:'planned',cat:'major', notes:'Target: CompTIA Sec+'},
-  {id:uid(),code:'PHYSICS 102', title:'Phys Engineers/Sci II',         units:5,sem:'fa2027',status:'planned',cat:'major', notes:'Req: PHYSICS 101'},
+  /* 2026 Spring — Taken */
+  {id:uid(),code:'ANTHRO 102',  title:'Human Ways Of Life',            units:3,sem:'sp2026',status:'done',   cat:'ge',    notes:''},
+  {id:uid(),code:'CS 101',      title:'Intro to Comp Sci',             units:3,sem:'sp2026',status:'done',   cat:'major', notes:''},
+  {id:uid(),code:'ENGL C1000',  title:'Academic Reading & Writing',    units:3,sem:'sp2026',status:'done',   cat:'ge',    notes:''},
+  {id:uid(),code:'HEALTH 101',  title:'Intro Public Health',           units:3,sem:'sp2026',status:'done',   cat:'ge',    notes:''},
+  /* 2026 Summer — Taken */
+  {id:uid(),code:'CIS 210',     title:'Intro to Computer Networking',  units:3,sem:'su2026',status:'done',   cat:'major', notes:'Prereq for CIS 214'},
+  {id:uid(),code:'POLS C1000',  title:'American Government & Politics',units:3,sem:'su2026',status:'done',   cat:'ge',    notes:''},
+  {id:uid(),code:'STAT C1000',  title:'Intro to Statistics',           units:3,sem:'su2026',status:'done',   cat:'ge',    notes:''},
+  /* 2026 Fall — In Progress */
+  {id:uid(),code:'ASIAN 001',   title:'Asian American Hist',           units:3,sem:'fa2026',status:'in-progress',cat:'ge',    notes:''},
+  {id:uid(),code:'CIS 112',     title:'Operating Systems',             units:3,sem:'fa2026',status:'in-progress',cat:'major', notes:''},
+  {id:uid(),code:'CIS 162',     title:'Cyber Security I',              units:3,sem:'fa2026',status:'in-progress',cat:'major', notes:''},
+  {id:uid(),code:'CIS 166',     title:'Computer Forensics',            units:3,sem:'fa2026',status:'in-progress',cat:'major', notes:''},
+  {id:uid(),code:'CIS 214',     title:'Intro to Netwk Plus',           units:3,sem:'fa2026',status:'in-progress',cat:'major', notes:'Req: CIS 210'},
+  {id:uid(),code:'CS 119',      title:'Python Programming',            units:3,sem:'fa2026',status:'in-progress',cat:'major', notes:'Req: CS 101'},
+  /* 2027 Winter — In Cart */
+  {id:uid(),code:'CO TECH 002', title:'Intro to Electronics',          units:3,sem:'wi2027',status:'planned',cat:'major', notes:''},
+  {id:uid(),code:'FAM CS 021',  title:'Nutrition',                     units:3,sem:'wi2027',status:'planned',cat:'ge',    notes:''},
+  /* 2027 Spring — In Cart */
+  {id:uid(),code:'CIS 170',     title:'Intro to Ethical Hacking',      units:3,sem:'sp2027',status:'planned',cat:'major', notes:'Req: CIS 112'},
+  {id:uid(),code:'CIS 191',     title:'Cloud+ Tech',                   units:3,sem:'sp2027',status:'planned',cat:'major', notes:''},
+  {id:uid(),code:'CIS 211',     title:'Security+ Preparatn',           units:3,sem:'sp2027',status:'planned',cat:'major', notes:'Target: CompTIA Sec+'},
+  {id:uid(),code:'CIS 212',     title:'A+ Cert Prep HW',               units:3,sem:'sp2027',status:'planned',cat:'major', notes:'A+ Core 1'},
+  {id:uid(),code:'CIS 213',     title:'A+ Operating Systems',          units:3,sem:'sp2027',status:'planned',cat:'major', notes:'A+ Core 2'},
 ];
 
 let courses=loadCourses(), goalUnits=loadGoal();
@@ -505,8 +511,8 @@ let _lastDeleted=null,_undoTimer=null;
 
 /* ── BUG FIX #3: persist milestone pct in localStorage ── */
 let _prevMilestonePct=loadMilestonePct();
-function loadMilestonePct(){try{return parseInt(localStorage.getItem('itsec_ms_pct_v7'))||0;}catch(e){return 0;}}
-function saveMilestonePct(p){try{localStorage.setItem('itsec_ms_pct_v7',p);}catch(e){}}
+function loadMilestonePct(){try{return parseInt(localStorage.getItem('itsec_ms_pct_v8'))||0;}catch(e){return 0;}}
+function saveMilestonePct(p){try{localStorage.setItem('itsec_ms_pct_v8',p);}catch(e){}}
 
 const MILESTONES=[
   {pct:25,emoji:'🌱',title:'25% Complete',sub:'Solid start — keep the momentum.'},
@@ -517,19 +523,19 @@ const MILESTONES=[
 
 /* ── STORAGE ── */
 function loadCourses(){
-  try{const s=localStorage.getItem('itsec_planner_v7');if(s){const a=JSON.parse(s);if(Array.isArray(a))return a.map(c=>({status:'planned',cat:'other',notes:'',...c}));}}catch(e){}
+  try{const s=localStorage.getItem('itsec_planner_v8');if(s){const a=JSON.parse(s);if(Array.isArray(a))return a.map(c=>({status:'planned',cat:'other',notes:'',...c}));}}catch(e){}
   return DEFAULT_COURSES.map(c=>({...c}));
 }
 /* BUG FIX #1: saveCourses does NOT call showToast — toast only from manualSave */
 function saveCourses(silent=false){
-  try{localStorage.setItem('itsec_planner_v7',JSON.stringify(courses));}catch(e){}
+  try{localStorage.setItem('itsec_planner_v8',JSON.stringify(courses));}catch(e){}
   if(!silent) silentDashUpdate();
 }
-function loadGoal(){try{return parseInt(localStorage.getItem('itsec_goal_v7'))||120;}catch(e){return 120;}}
-function saveGoal(v){try{localStorage.setItem('itsec_goal_v7',v);}catch(e){}}
+function loadGoal(){try{return parseInt(localStorage.getItem('itsec_goal_v8'))||120;}catch(e){return 120;}}
+function saveGoal(v){try{localStorage.setItem('itsec_goal_v8',v);}catch(e){}}
 
 function loadDefaultPlan(){
-  if(!confirm('Load the default 19-course IT Cybersecurity plan?\nThis replaces your current plan.'))return;
+  if(!confirm('Load the default 20-course IT Cybersecurity plan?\nThis replaces your current plan.'))return;
   courses=DEFAULT_COURSES.map(c=>({...c}));saveCourses();render();
 }
 function loadDemo(){
@@ -984,9 +990,9 @@ document.getElementById('goal-units').addEventListener('change',function(){
 // Theme
 const themeToggle=document.getElementById('theme-toggle');
 const themeIcon=themeToggle.querySelector('.theme-icon');
-function setTheme(light){document.body.classList.toggle('light',light);themeIcon.textContent=light?'☀️':'🌙';try{localStorage.setItem('itsec_theme_v7',light?'light':'dark');}catch(e){}}
+function setTheme(light){document.body.classList.toggle('light',light);themeIcon.textContent=light?'☀️':'🌙';try{localStorage.setItem('itsec_theme_v8',light?'light':'dark');}catch(e){}}
 themeToggle.addEventListener('click',()=>setTheme(!document.body.classList.contains('light')));
-try{if(localStorage.getItem('itsec_theme_v7')==='light')setTheme(true);}catch(e){}
+try{if(localStorage.getItem('itsec_theme_v8')==='light')setTheme(true);}catch(e){}
 
 if(window.innerWidth<=680)document.getElementById('mobile-tabs').style.display='block';
 
