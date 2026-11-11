@@ -483,7 +483,7 @@ const DEFAULT_COURSES=[
   {id:uid(),code:'ENGL C1000',  title:'Academic Reading & Writing',    units:3,sem:'sp2026',status:'done',   cat:'ge',    notes:''},
   {id:uid(),code:'HEALTH 101',  title:'Intro Public Health',           units:3,sem:'sp2026',status:'done',   cat:'ge',    notes:''},
   /* 2026 Summer — Taken */
-  {id:uid(),code:'CIS 210',     title:'Intro to Computer Networking',  units:3,sem:'su2026',status:'done',   cat:'major', notes:'Prereq for CIS 214'},
+  {id:uid(),code:'CIS 210',     title:'Intro to Comp Networking',      units:3,sem:'su2026',status:'done',   cat:'major', notes:'Prereq for CIS 214'},
   {id:uid(),code:'POLS C1000',  title:'American Government & Politics',units:3,sem:'su2026',status:'done',   cat:'ge',    notes:''},
   /* 2026 Fall — In Progress */
   {id:uid(),code:'ASIAN 001',   title:'Asian American History',        units:3,sem:'fa2026',status:'done',cat:'ge',    notes:''},
@@ -989,7 +989,7 @@ const themeToggle=document.getElementById('theme-toggle');
 const themeIcon=themeToggle.querySelector('.theme-icon');
 function setTheme(light){document.body.classList.toggle('light',light);themeIcon.textContent=light?'☀️':'🌙';try{localStorage.setItem('itsec_theme_v8',light?'light':'dark');}catch(e){}}
 themeToggle.addEventListener('click',()=>setTheme(!document.body.classList.contains('light')));
-try{if(localStorage.getItem('itsec_theme_v8')==='light')setTheme(true);}catch(e){}
+try{if(localStorage.getItem('itsec_theme_v8')!=='dark')setTheme(true);}catch(e){}
 
 if(window.innerWidth<=680)document.getElementById('mobile-tabs').style.display='block';
 
