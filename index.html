@@ -546,9 +546,9 @@ const DEFAULT_COURSES=[
   /* 2027 Spring — In Cart */
   {id:uid(),code:'CIS 170',     title:'Intro to Ethical Hacking',      units:3,sem:'sp2027',status:'in-progress',cat:'major', notes:'Req: CIS 112'},
   {id:uid(),code:'CIS 191',     title:'Cloud+ Cert. Prep',             units:3,sem:'sp2027',status:'in-progress',cat:'major', notes:''},
-  {id:uid(),code:'CIS 211',     title:'Security+ Cert. Prep',          units:3,sem:'sp2027',status:'in-progress',cat:'major', notes:'Target: CompTIA Sec+'},
-  {id:uid(),code:'CIS 212',     title:'A+ Hardware Cert. Prep',        units:3,sem:'sp2027',status:'in-progress',cat:'major', notes:'A+ Core 1'},
-  {id:uid(),code:'CIS 213',     title:'A+ Software Cert. Prep',        units:3,sem:'sp2027',status:'in-progress',cat:'major', notes:'A+ Core 2'},
+  {id:uid(),code:'CIS 211',     title:'Security+ Cert. Prep',          units:3,sem:'sp2027',status:'in-progress',cat:'major', notes:''},
+  {id:uid(),code:'CIS 212',     title:'A+ Hardware Cert. Prep',        units:3,sem:'sp2027',status:'in-progress',cat:'major', notes:''},
+  {id:uid(),code:'CIS 213',     title:'A+ Software Cert. Prep',        units:3,sem:'sp2027',status:'in-progress',cat:'major', notes:''},
 ];
 
 const MILESTONES=[
@@ -613,6 +613,33 @@ function ensureUniqueIds(list){
   return list;
 }
 
+/* One-off corrections for notes that shipped in an earlier default and were
+   removed on purpose. Without this a visitor who already saved the plan would
+   keep the old note for ever, because the merge below only fills empty fields.
+   The flag makes it a single event per browser: if the visitor later types the
+   same text themselves, it is theirs and is never rewritten. */
+const NOTE_FIXES=[
+  {code:'cis 211',drop:'Target: CompTIA Sec+'},
+  {code:'cis 212',drop:'A+ Core 1'},
+  {code:'cis 213',drop:'A+ Core 2'}
+];
+const NOTE_FIX_KEY='itsec_notefix_v1';
+function applyNoteFixes(list){
+  let done=false;
+  try{done=localStorage.getItem(NOTE_FIX_KEY)==='1';}catch(e){}
+  if(done)return list;
+  let changed=false;
+  list.forEach(c=>{
+    const code=String(c.code||'').trim().toLowerCase();
+    NOTE_FIXES.forEach(f=>{
+      if(code===f.code&&String(c.notes||'').trim()===f.drop){c.notes='';changed=true;}
+    });
+  });
+  if(changed)lsWrite(LS_BASE.planner,JSON.stringify(list));
+  try{localStorage.setItem(NOTE_FIX_KEY,'1');}catch(e){}
+  return list;
+}
+
 function loadCourses(){
   let saved=null;
   try{
@@ -633,7 +660,7 @@ function loadCourses(){
     const mine=saved.find(c=>String(c.code||'').trim().toLowerCase()===key);
     if(mine&&!String(mine.notes||'').trim()&&String(d.notes||'').trim())mine.notes=d.notes;
   });
-  return ensureUniqueIds(saved);
+  return applyNoteFixes(ensureUniqueIds(saved));
 }
 function saveCourses(silent=false){
   if(!lsWrite(LS_BASE.planner,JSON.stringify(courses)))showToast('⚠️ Save failed — storage full or private mode');
