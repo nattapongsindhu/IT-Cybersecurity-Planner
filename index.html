@@ -231,8 +231,10 @@
     .cal-dot{width:5px;height:5px;border-radius:50%;flex-shrink:0;}
     .cal-sem-total{font-family:'Space Mono',monospace;font-size:0.56rem;color:var(--muted);padding-top:6px;white-space:nowrap;width:100%;}
 
-    /* mobile tab bar — CSS only, no JS resize hook */
-    .mobile-tabs{display:none;border-bottom:1px solid var(--border);background:var(--bg2);}
+    /* mobile tab bar — CSS only, no JS resize hook.
+       Sticky so the tabs stay reachable while scrolling a long plan; it parks
+       directly under the 56px nav. */
+    .mobile-tabs{display:none;border-bottom:1px solid var(--border);background:var(--bg2);position:sticky;top:56px;z-index:190;}
     .mobile-tabs > div{display:flex;justify-content:center;gap:4px;padding:6px 1rem;}
 
     @media(max-width:680px){
@@ -280,10 +282,10 @@
 <!-- ── NAV ── -->
 <nav>
   <div class="logo"><span style="color:var(--text)">IT</span> <span style="color:var(--accent)">Cybersecurity</span></div>
-  <div class="nav-center">
-    <button class="tab-btn active" data-tab="dashboard" onclick="switchTab('dashboard')">📊 Dashboard</button>
-    <button class="tab-btn" data-tab="planner" onclick="switchTab('planner')">📋 Planner</button>
-    <button class="tab-btn" data-tab="calendar" onclick="switchTab('calendar')">📅 Calendar</button>
+  <div class="nav-center" role="tablist" aria-label="Sections">
+    <button class="tab-btn active" role="tab" id="tab-dashboard" aria-controls="panel-dashboard" aria-selected="true" data-tab="dashboard" onclick="switchTab('dashboard')">📊 Dashboard</button>
+    <button class="tab-btn" role="tab" id="tab-planner" aria-controls="panel-planner" aria-selected="false" data-tab="planner" onclick="switchTab('planner')">📋 Planner</button>
+    <button class="tab-btn" role="tab" id="tab-calendar" aria-controls="panel-calendar" aria-selected="false" data-tab="calendar" onclick="switchTab('calendar')">📅 Calendar</button>
   </div>
   <div class="nav-right">
     <div class="badge-total" id="nav-total">— units</div>
@@ -306,15 +308,15 @@
 
 <!-- ── MOBILE TAB BAR ── -->
 <div class="mobile-tabs" id="mobile-tabs">
-  <div style="display:flex;justify-content:center;gap:4px;padding:6px 1rem;">
-    <button class="tab-btn active" data-tab="dashboard" onclick="switchTab('dashboard')">📊 Dashboard</button>
-    <button class="tab-btn" data-tab="planner" onclick="switchTab('planner')">📋 Planner</button>
-    <button class="tab-btn" data-tab="calendar" onclick="switchTab('calendar')">📅 Calendar</button>
+  <div role="tablist" aria-label="Sections" style="display:flex;justify-content:center;gap:4px;padding:6px 1rem;">
+    <button class="tab-btn active" role="tab" id="mtab-dashboard" aria-controls="panel-dashboard" aria-selected="true" data-tab="dashboard" onclick="switchTab('dashboard')">📊 Dashboard</button>
+    <button class="tab-btn" role="tab" id="mtab-planner" aria-controls="panel-planner" aria-selected="false" data-tab="planner" onclick="switchTab('planner')">📋 Planner</button>
+    <button class="tab-btn" role="tab" id="mtab-calendar" aria-controls="panel-calendar" aria-selected="false" data-tab="calendar" onclick="switchTab('calendar')">📅 Calendar</button>
   </div>
 </div>
 
 <!-- ════════ DASHBOARD ════════ -->
-<div class="tab-panel active" id="panel-dashboard">
+<div class="tab-panel active" id="panel-dashboard" role="tabpanel" aria-label="Dashboard">
   <div class="page-header">
     <div class="page-title" style="color:var(--text)">Dashboard</div>
     <div class="page-sub">Overview of your degree progress and course distribution.</div>
@@ -385,7 +387,7 @@
 </div>
 
 <!-- ════════ PLANNER ════════ -->
-<div class="tab-panel" id="panel-planner">
+<div class="tab-panel" id="panel-planner" role="tabpanel" aria-label="Course planner">
   <div class="page-header">
     <div class="page-title" style="color:var(--text)">Course Planner</div>
     <div class="page-sub">All fields editable inline · Dropdowns to move, set status, and categorize.</div>
@@ -448,7 +450,7 @@
 </div>
 
 <!-- ════════ CALENDAR ════════ -->
-<div class="tab-panel" id="panel-calendar">
+<div class="tab-panel" id="panel-calendar" role="tabpanel" aria-label="Calendar">
   <div class="page-header">
     <div class="page-title" style="color:var(--text)">Calendar View</div>
     <div class="page-sub">Timeline of all courses by semester. Hover a chip for details.</div>
@@ -464,13 +466,13 @@
   <div id="calendar-container"></div>
 </div>
 
-<div id="save-toast">✓ Saved</div>
-<div id="ms-overlay" onclick="closeMilestone()"></div>
-<div id="milestone-popup">
-  <span class="ms-emoji" id="ms-emoji">🏆</span>
+<div id="save-toast" role="status" aria-live="polite">✓ Saved</div>
+<div id="ms-overlay" onclick="closeMilestone()" aria-hidden="true"></div>
+<div id="milestone-popup" role="dialog" aria-modal="true" aria-labelledby="ms-title" aria-describedby="ms-sub">
+  <span class="ms-emoji" id="ms-emoji" aria-hidden="true">🏆</span>
   <div class="ms-title" id="ms-title">Milestone!</div>
   <div class="ms-sub"   id="ms-sub">Keep going.</div>
-  <button onclick="closeMilestone()">Keep Going →</button>
+  <button id="ms-close" onclick="closeMilestone()">Keep Going →</button>
 </div>
 
 <script>
@@ -579,28 +581,55 @@ function saveRemoved(set){lsWrite(LS_BASE.removed,JSON.stringify([...set]));}
 /* Courses deleted on purpose — the merge below must not resurrect them. */
 let removedCodes=loadRemoved();
 
+/* One normaliser for EVERY untrusted source (localStorage and imported JSON).
+   Status, category, units and semester are coerced to a known value, and any id
+   that is not a generated safe id is replaced — so nothing that came from
+   storage or a file can reach the DOM as markup or act as a CSS selector. */
+const SAFE_ID=/^[A-Za-z0-9_-]{1,64}$/;
+function isSafeId(v){return typeof v==='string'&&SAFE_ID.test(v);}
+function sanitizeCourse(raw){
+  if(!raw||typeof raw!=='object')return null;
+  const code=String(raw.code==null?'':raw.code).trim();
+  const title=String(raw.title==null?'':raw.title).trim();
+  if(!code&&!title)return null;
+  let units=Number(raw.units);
+  if(!isFinite(units)||units<0.5||units>30)units=3;
+  const sem=String(raw.sem==null?'':raw.sem).trim();
+  return {
+    id:isSafeId(raw.id)?raw.id:uid(),
+    code:code||title,
+    title:title||code,
+    units,
+    status:STATUSES.includes(raw.status)?raw.status:'planned',
+    cat:CATS.includes(raw.cat)?raw.cat:'other',
+    sem:isValidTerm(sem)?sem:'unassigned',
+    notes:String(raw.notes==null?'':raw.notes)
+  };
+}
+/* Two rows sharing one id would edit each other through courses.find(...). */
+function ensureUniqueIds(list){
+  const seen=new Set();
+  list.forEach(c=>{while(seen.has(c.id))c.id=uid();seen.add(c.id);});
+  return list;
+}
+
 function loadCourses(){
   let saved=null;
   try{
     const s=lsRead(LS_BASE.planner);
     if(s){
       const a=JSON.parse(s);
-      if(Array.isArray(a))saved=a.filter(c=>c&&typeof c==='object').map(c=>{
-        const course={status:'planned',cat:'other',notes:'',...c};
-        /* stored data can be hand-edited too: keep only known-shaped term ids */
-        course.sem=isValidTerm(String(course.sem||''))?String(course.sem).trim():'unassigned';
-        return course;
-      });
+      if(Array.isArray(a))saved=a.map(sanitizeCourse).filter(Boolean);
     }
   }catch(e){}
-  if(!saved)return DEFAULT_COURSES.filter(d=>!removedCodes.has(d.code.trim().toLowerCase())).map(c=>({...c}));
+  if(!saved)return ensureUniqueIds(DEFAULT_COURSES.filter(d=>!removedCodes.has(d.code.trim().toLowerCase())).map(c=>({...c})));
   /* Merge courses that were added to the default plan after this visitor saved. */
   const have=new Set(saved.map(c=>String(c.code||'').trim().toLowerCase()));
   DEFAULT_COURSES.forEach(d=>{
     const key=d.code.trim().toLowerCase();
     if(!have.has(key)&&!removedCodes.has(key)){saved.push({...d});have.add(key);}
   });
-  return saved;
+  return ensureUniqueIds(saved);
 }
 function saveCourses(silent=false){
   if(!lsWrite(LS_BASE.planner,JSON.stringify(courses)))showToast('⚠️ Save failed — storage full or private mode');
@@ -647,7 +676,11 @@ function manualSave(){saveCourses(true);showToast('💾 Saved!');}
 let currentTab='dashboard';
 function switchTab(tab){
   currentTab=tab;
-  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.toggle('active',b.dataset.tab===tab));
+  document.querySelectorAll('.tab-btn').forEach(b=>{
+    const on=b.dataset.tab===tab;
+    b.classList.toggle('active',on);
+    b.setAttribute('aria-selected',on?'true':'false');
+  });
   document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
   document.getElementById('panel-'+tab).classList.add('active');
   closeMore();
@@ -655,18 +688,59 @@ function switchTab(tab){
   else if(tab==='dashboard')renderDashboard();
   else if(tab==='planner'){renderPlanner();renderStats();}
 }
+/* Arrow keys / Home / End move between the tabs of one tab list (WAI-ARIA
+   tabs pattern). Both the desktop and the mobile list work the same way. */
+document.querySelectorAll('[role="tablist"]').forEach(list=>{
+  list.addEventListener('keydown',e=>{
+    const tabs=[...list.querySelectorAll('[role="tab"]')];
+    const i=tabs.indexOf(document.activeElement);
+    if(i===-1)return;
+    let next=null;
+    if(e.key==='ArrowRight')next=(i+1)%tabs.length;
+    else if(e.key==='ArrowLeft')next=(i-1+tabs.length)%tabs.length;
+    else if(e.key==='Home')next=0;
+    else if(e.key==='End')next=tabs.length-1;
+    if(next===null)return;
+    e.preventDefault();
+    tabs[next].focus();
+    switchTab(tabs[next].dataset.tab);
+  });
+});
 
 /* ── MORE DROPDOWN ── */
+function moreItems(){return [...document.querySelectorAll('#more-dropdown .dd-item')];}
 function toggleMore(e){
   e.stopPropagation();
   const dd=document.getElementById('more-dropdown');
   const open=dd.classList.toggle('open');
   document.getElementById('more-btn').setAttribute('aria-expanded',open?'true':'false');
+  /* e.detail===0 means the click came from the keyboard: move focus into the
+     menu so arrow keys work straight away. Mouse users keep their pointer. */
+  if(open&&e.detail===0){const items=moreItems();if(items.length)items[0].focus();}
 }
-function closeMore(){
+function closeMore(returnFocus=false){
   document.getElementById('more-dropdown').classList.remove('open');
   document.getElementById('more-btn').setAttribute('aria-expanded','false');
+  /* strict check: closeMore is also used directly as a scroll listener, where
+     the first argument is an Event (always truthy). */
+  if(returnFocus===true)document.getElementById('more-btn').focus();
 }
+document.getElementById('more-dropdown').addEventListener('keydown',e=>{
+  const items=moreItems();
+  if(!items.length)return;
+  const i=items.indexOf(document.activeElement);
+  if(e.key==='ArrowDown'||e.key==='ArrowUp'){
+    e.preventDefault();
+    const d=e.key==='ArrowDown'?1:-1;
+    items[(i+d+items.length)%items.length].focus();
+  }else if(e.key==='Home'){e.preventDefault();items[0].focus();}
+  else if(e.key==='End'){e.preventDefault();items[items.length-1].focus();}
+});
+document.addEventListener('keydown',e=>{
+  if(e.key!=='Escape')return;
+  const dd=document.getElementById('more-dropdown');
+  if(dd.classList.contains('open')){e.preventDefault();closeMore(true);}
+});
 document.addEventListener('click',()=>{
   closeMore();
   document.querySelectorAll('.cal-chip.tip-open').forEach(ch=>ch.classList.remove('tip-open'));
@@ -684,21 +758,13 @@ function exportJSON(){
 function normalizeImport(raw){
   const out=[];
   raw.forEach(c=>{
-    if(!c||typeof c!=='object')return;
-    const code=String(c.code||'').trim();
-    const title=String(c.title||'').trim();
-    let units=Number(c.units);
-    if(!isFinite(units)||units<0.5||units>30)units=3;
-    const status=STATUSES.includes(c.status)?c.status:'planned';
-    const cat=CATS.includes(c.cat)?c.cat:'other';
-    /* Imported term must be a known-shaped id; anything else falls back to unassigned
-       so attacker-supplied text can never reach the DOM. */
-    let sem=String(c.sem||'').trim();
-    if(!isValidTerm(sem))sem='unassigned';
-    if(!code&&!title)return;
-    out.push({id:uid(),code:code||title,title:title||code,units,status,cat,sem,notes:String(c.notes||'')});
+    const clean=sanitizeCourse(c);
+    if(clean)out.push(clean);
   });
-  return out;
+  /* Ids in a backup file carry no meaning here — mint fresh ones so imported
+     records can never collide with (or hijack) a course already in the plan. */
+  out.forEach(c=>{c.id=uid();});
+  return ensureUniqueIds(out);
 }
 function importJSON(input){
   closeMore();
@@ -740,13 +806,38 @@ function exportCSV(){
 function exportPDF(){
   closeMore();
   const prev=currentTab;
-  document.querySelectorAll('.tab-panel').forEach(p=>{p._pd=p.style.display;p.style.display='none';});
+  const panels=[...document.querySelectorAll('.tab-panel')];
+  panels.forEach(p=>{p._pd=p.style.display;p.style.display='none';});
   document.getElementById('panel-planner').style.display='block';
+  /* window.print() blocks in most browsers, but not all. Restore on the
+     afterprint event and keep an idempotent timer as the safety net. */
+  let restored=false;
+  const restore=()=>{
+    if(restored)return;
+    restored=true;
+    window.removeEventListener('afterprint',restore);
+    panels.forEach(p=>{p.style.display=p._pd||'';});
+    switchTab(prev);
+  };
+  window.addEventListener('afterprint',restore);
   window.print();
-  setTimeout(()=>{document.querySelectorAll('.tab-panel').forEach(p=>{p.style.display=p._pd||'';});switchTab(prev);},600);
+  setTimeout(restore,1000);
 }
 
 /* ── UNDO ── */
+/* A default course that was deleted stays deleted, and one that was RENAMED
+   must leave the same tombstone behind its old code — otherwise the next load
+   merges the original default back in and the plan ends up with both rows. */
+function retireOldCode(course,nextCode){
+  const oldKey=String(course.code||'').trim().toLowerCase();
+  const newKey=String(nextCode==null?'':nextCode).trim().toLowerCase();
+  if(newKey)removedCodes.delete(newKey);            /* that code is back in the plan */
+  if(!oldKey||oldKey===newKey){saveRemoved(removedCodes);return;}
+  const inDefault=DEFAULT_COURSES.some(d=>d.code.trim().toLowerCase()===oldKey);
+  const stillUsed=courses.some(c=>c!==course&&String(c.code||'').trim().toLowerCase()===oldKey);
+  if(inDefault&&!stillUsed)removedCodes.add(oldKey);
+  saveRemoved(removedCodes);
+}
 function scheduleUndo(course){
   _lastDeleted=course;
   document.getElementById('undo-msg').textContent=`"${course.code}" removed.`;
@@ -765,6 +856,7 @@ function undoDelete(){
 }
 
 /* ── MILESTONE (persisted, no repeat) ── */
+let _msPrevFocus=null;
 function checkMilestone(pct){
   const crossed=MILESTONES.filter(m=>_prevMilestonePct<m.pct&&pct>=m.pct);
   if(crossed.length){
@@ -772,15 +864,32 @@ function checkMilestone(pct){
     document.getElementById('ms-emoji').textContent=m.emoji;
     document.getElementById('ms-title').textContent=m.title;
     document.getElementById('ms-sub').textContent=m.sub;
+    /* Move focus into the dialog (and remember where it came from) so the
+       popup is announced and Escape/Tab behave like a real modal. */
+    _msPrevFocus=document.activeElement;
     document.getElementById('milestone-popup').classList.add('show');
     document.getElementById('ms-overlay').classList.add('show');
+    document.getElementById('ms-close').focus();
   }
   if(pct!==_prevMilestonePct){_prevMilestonePct=pct;saveMilestonePct(pct);}
 }
 function closeMilestone(){
-  document.getElementById('milestone-popup').classList.remove('show');
+  const popup=document.getElementById('milestone-popup');
+  if(!popup.classList.contains('show'))return;
+  popup.classList.remove('show');
   document.getElementById('ms-overlay').classList.remove('show');
+  if(_msPrevFocus&&document.contains(_msPrevFocus))_msPrevFocus.focus();
+  _msPrevFocus=null;
 }
+document.getElementById('milestone-popup').addEventListener('keydown',e=>{
+  if(e.key==='Escape'){e.preventDefault();closeMilestone();return;}
+  if(e.key!=='Tab')return;
+  const focusable=[...document.querySelectorAll('#milestone-popup button, #milestone-popup [href], #milestone-popup input, #milestone-popup [tabindex]:not([tabindex="-1"])')];
+  if(!focusable.length)return;
+  const first=focusable[0],last=focusable[focusable.length-1];
+  if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus();}
+  else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus();}
+});
 
 /* ── VALIDATION ── */
 function validateUnits(v){const n=parseFloat(v);return !isNaN(n)&&n>=0.5&&n<=30;}
@@ -802,6 +911,7 @@ function renderTableBody(tbody,list){
 
     // status
     const stSel=document.createElement('select');stSel.className='status-select '+(course.status||'planned');
+    stSel.setAttribute('aria-label','Status for '+course.code);
     [{v:'planned',l:'Planned'},{v:'in-progress',l:'In Progress'},{v:'done',l:'Done'}].forEach(({v,l})=>{
       const o=document.createElement('option');o.value=v;o.textContent=l;if(v===(course.status||'planned'))o.selected=true;stSel.appendChild(o);
     });
@@ -809,6 +919,7 @@ function renderTableBody(tbody,list){
 
     // category
     const catSel=document.createElement('select');catSel.className='cat-select '+(course.cat||'other');
+    catSel.setAttribute('aria-label','Category for '+course.code);
     [{v:'other',l:'—'},{v:'ge',l:'GE'},{v:'major',l:'Major'},{v:'elective',l:'Elective'}].forEach(({v,l})=>{
       const o=document.createElement('option');o.value=v;o.textContent=l;if(v===(course.cat||'other'))o.selected=true;catSel.appendChild(o);
     });
@@ -816,16 +927,20 @@ function renderTableBody(tbody,list){
 
     // semester
     const semSel=document.createElement('select');semSel.className='sem-select';
+    semSel.setAttribute('aria-label','Semester for '+course.code);
     populateSemSelect(semSel,course.sem);
     semSel.addEventListener('change',()=>{const c=courses.find(x=>x.id===course.id);if(!c)return;c.sem=semSel.value;saveCourses();render();});
 
+    /* Every value in this template is untrusted: ids and units come from
+       localStorage too, so they are escaped exactly like code/title/notes. */
+    const id=esc(course.id);
     tr.innerHTML=`
-      <td><input class="code-edit"  value="${esc(course.code)}"  data-field="code"  data-id="${course.id}"></td>
-      <td><input class="title-edit" value="${esc(course.title)}" data-field="title" data-id="${course.id}"></td>
-      <td><input class="notes-edit" value="${esc(course.notes||'')}" data-field="notes" data-id="${course.id}" placeholder="notes…"></td>
-      <td style="text-align:center"><input class="units-edit" type="number" value="${course.units}" min="0.5" max="30" step="0.5" data-field="units" data-id="${course.id}"></td>
+      <td><input class="code-edit"  value="${esc(course.code)}"  data-field="code"  data-id="${id}" aria-label="Course code"></td>
+      <td><input class="title-edit" value="${esc(course.title)}" data-field="title" data-id="${id}" aria-label="Course title for ${esc(course.code)}"></td>
+      <td><input class="notes-edit" value="${esc(course.notes||'')}" data-field="notes" data-id="${id}" placeholder="notes…" aria-label="Notes for ${esc(course.code)}"></td>
+      <td style="text-align:center"><input class="units-edit" type="number" value="${esc(course.units)}" min="0.5" max="30" step="0.5" data-field="units" data-id="${id}" aria-label="Units for ${esc(course.code)}"></td>
       <td class="td-st"></td><td class="td-cat"></td><td class="td-sem"></td>
-      <td><div class="actions-cell"><button class="del-btn" data-id="${course.id}" title="Remove">✕</button></div></td>
+      <td><div class="actions-cell"><button class="del-btn" data-id="${id}" title="Remove" aria-label="Remove ${esc(course.code)}">✕</button></div></td>
     `;
     tr.querySelector('.td-st').appendChild(stSel);
     tr.querySelector('.td-cat').appendChild(catSel);
@@ -837,7 +952,10 @@ function renderTableBody(tbody,list){
         if(inp.dataset.field==='units'){
           if(!validateUnits(inp.value)){inp.classList.add('invalid');inp.value=c.units;setTimeout(()=>inp.classList.remove('invalid'),1200);return;}
           c.units=parseFloat(inp.value);
-        }else{c[inp.dataset.field]=inp.value;}
+        }else{
+          if(inp.dataset.field==='code')retireOldCode(c,inp.value);
+          c[inp.dataset.field]=inp.value;
+        }
         saveCourses();
         if(inp.dataset.field==='units')renderStats();
       });
@@ -1078,7 +1196,7 @@ function renderCalendar(){
   container.appendChild(frag);
 }
 
-function esc(s){return String(s).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/'/g,'&#39;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
 
 /* ── MASTER RENDER (only active tab) ── */
 function render(){
