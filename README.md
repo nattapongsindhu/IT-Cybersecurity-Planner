@@ -71,7 +71,7 @@ Terms come from `const TERM_YEARS` + a fixed Spring → Summer → Fall → Wint
    node scripts/check-data.js
    ```
 
-   It fails on duplicate codes, non-numeric units, unknown status/category, a term outside `TERM_YEARS`, or an unexpected course count.
+   It fails on duplicate codes, non-numeric units, unknown status/category, or a term outside `TERM_YEARS`. The plan may grow freely — add `--courses=22` (or `EXPECTED_COURSES=22`) when you want the exact count pinned, so a dropped entry still fails the check.
 3. Commit and push — GitHub Pages publishes `main` automatically.
 
 `scripts/check-data.js` also runs in CI on every push ([`.github/workflows/data-check.yml`](.github/workflows/data-check.yml)), together with a parse check of the inline script.

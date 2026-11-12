@@ -12,9 +12,26 @@
 const fs = require('fs');
 const path = require('path');
 
-const HTML_PATH = process.argv[2]
-  ? path.resolve(process.argv[2])
+const argv = process.argv.slice(2);
+const flags = new Map(
+  argv
+    .filter((a) => a.startsWith('--'))
+    .map((a) => {
+      const [key, value] = a.replace(/^--/, '').split('=');
+      return [key, value === undefined ? 'true' : value];
+    })
+);
+const HTML_ARG = argv.find((a) => !a.startsWith('--'));
+const HTML_PATH = HTML_ARG
+  ? path.resolve(HTML_ARG)
   : path.join(__dirname, '..', 'index.html');
+
+/* The plan is allowed to grow, so the exact size is not enforced by default.
+   Pass --courses=22 (or set EXPECTED_COURSES=22) to pin it and catch an entry
+   that was dropped by accident. */
+const EXPECTED_RAW = flags.get('courses') ?? process.env.EXPECTED_COURSES;
+const EXPECTED_COURSES = EXPECTED_RAW == null ? null : Number(EXPECTED_RAW);
+
 const VALID_STATUS = ['planned', 'in-progress', 'done'];
 const VALID_CAT = ['other', 'ge', 'major', 'elective'];
 const KINDS = [
@@ -76,7 +93,13 @@ try {
 }
 
 if (!Array.isArray(courses) || !courses.length) fail('DEFAULT_COURSES is empty');
-if (courses.length !== 21) fail(`expected 21 courses, found ${courses.length}`);
+else if (EXPECTED_COURSES != null) {
+  if (!Number.isInteger(EXPECTED_COURSES) || EXPECTED_COURSES < 1) {
+    fail(`--courses must be a positive integer (got "${EXPECTED_RAW}")`);
+  } else if (courses.length !== EXPECTED_COURSES) {
+    fail(`expected ${EXPECTED_COURSES} courses, found ${courses.length} (update --courses / EXPECTED_COURSES if the plan changed)`);
+  }
+}
 
 const seen = new Map();
 let totalUnits = 0;
