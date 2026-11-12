@@ -141,7 +141,7 @@
     tbody tr{border-bottom:1px solid rgba(59,158,255,.06);transition:background .15s;}
     tbody tr:hover{background:var(--bg3);}
     tbody td{padding:7px 7px;font-size:0.79rem;vertical-align:middle;}
-    .code-edit{background:none;border:none;color:var(--accent);font-family:'Space Mono',monospace;font-size:0.71rem;font-weight:700;width:86px;outline:none;cursor:pointer;padding:2px 3px;border-radius:3px;transition:background .15s;}
+    .code-edit{background:none;border:none;color:var(--text);font-family:'Space Mono',monospace;font-size:0.71rem;font-weight:700;width:86px;outline:none;cursor:pointer;padding:2px 3px;border-radius:3px;transition:background .15s;}
     .code-edit:hover,.code-edit:focus{background:rgba(59,158,255,.09);cursor:text;}
     .title-edit{background:none;border:none;color:var(--text);font-family:'DM Sans',sans-serif;font-size:0.79rem;width:100%;outline:none;cursor:pointer;padding:2px 3px;border-radius:3px;transition:background .15s;}
     .title-edit:hover,.title-edit:focus{background:rgba(59,158,255,.09);cursor:text;}
@@ -150,13 +150,13 @@
     .units-edit{background:none;border:none;color:var(--text);font-family:'Space Mono',monospace;font-size:0.76rem;width:44px;text-align:center;outline:none;cursor:pointer;padding:2px 3px;border-radius:3px;transition:background .15s;}
     .units-edit:hover,.units-edit:focus{background:rgba(59,158,255,.09);}
     .units-edit.invalid{color:var(--red);}
-    .status-select{background:var(--bg3);border:1px solid rgba(107,114,128,.35);border-radius:5px;font-family:'Space Mono',monospace;font-size:0.58rem;padding:3px 5px;cursor:pointer;outline:none;transition:border-color .2s;color:var(--muted);}
-    .status-select.in-progress{border-color:var(--gold);color:var(--gold);background:rgba(249,168,37,.07);}
-    .status-select.done{border-color:var(--green);color:var(--green);background:rgba(128,196,74,.07);}
-    .cat-select{background:var(--bg3);border:1px solid var(--border);border-radius:5px;font-family:'Space Mono',monospace;font-size:0.58rem;padding:3px 5px;cursor:pointer;outline:none;color:var(--muted);}
-    .cat-select.ge{border-color:var(--purple);color:var(--purple);background:rgba(167,139,250,.07);}
-    .cat-select.major{border-color:var(--accent);color:var(--accent);background:rgba(59,158,255,.07);}
-    .cat-select.elective{border-color:var(--teal);color:var(--teal);background:rgba(34,211,165,.07);}
+    .status-select{background:var(--bg3);border:1px solid rgba(107,114,128,.35);border-radius:5px;font-family:'Space Mono',monospace;font-size:0.58rem;padding:3px 5px;cursor:pointer;outline:none;transition:border-color .2s;color:var(--text);}
+    .status-select.in-progress{border-color:var(--gold);color:var(--text);background:rgba(249,168,37,.07);}
+    .status-select.done{border-color:var(--green);color:var(--text);background:rgba(128,196,74,.07);}
+    .cat-select{background:var(--bg3);border:1px solid var(--border);border-radius:5px;font-family:'Space Mono',monospace;font-size:0.58rem;padding:3px 5px;cursor:pointer;outline:none;color:var(--text);}
+    .cat-select.ge{border-color:var(--purple);color:var(--text);background:rgba(167,139,250,.07);}
+    .cat-select.major{border-color:var(--accent);color:var(--text);background:rgba(59,158,255,.07);}
+    .cat-select.elective{border-color:var(--teal);color:var(--text);background:rgba(34,211,165,.07);}
     .sem-select{background:var(--bg3);border:1px solid var(--border);border-radius:5px;color:var(--muted);font-family:'Space Mono',monospace;font-size:0.58rem;padding:3px 5px;cursor:pointer;outline:none;transition:border-color .2s,color .2s;}
     .sem-select:hover,.sem-select:focus{border-color:var(--accent);color:var(--text);}
     .del-btn{background:none;border:none;color:var(--muted);cursor:pointer;font-size:.82rem;padding:3px 5px;border-radius:3px;transition:color .15s,background .15s;line-height:1;}
@@ -268,8 +268,8 @@
       table{border:1px solid #ddd;min-width:unset;}
       thead th{background:#f0f0f0!important;color:#333!important;}
       tbody tr{border-bottom:1px solid #eee;}
-      .code-edit{color:#1a6fc4!important;}
-      .status-select,.cat-select{border:1px solid #ccc;color:#333!important;background:none!important;}
+      .code-edit{color:#000!important;}
+      .status-select,.cat-select{border:1px solid #ccc;color:#000!important;background:none!important;}
       .notes-edit{color:#555!important;font-style:italic;}
       @page{margin:1.3cm;}
     }
