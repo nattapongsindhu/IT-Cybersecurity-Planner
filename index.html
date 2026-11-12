@@ -536,7 +536,7 @@ const DEFAULT_COURSES=[
   /* 2026 Fall — In Progress */
   {id:uid(),code:'ASIAN 001',   title:'Asian American History',        units:3,sem:'fa2026',status:'done',cat:'ge',    notes:''},
   {id:uid(),code:'CIS 112',     title:'OS: Beginning Linux',           units:3,sem:'fa2026',status:'done',cat:'major', notes:''},
-  {id:uid(),code:'CIS 162',     title:'Cyber Security I',              units:3,sem:'fa2026',status:'done',cat:'major', notes:''},
+  {id:uid(),code:'CIS 162',     title:'Cyber Security I',              units:3,sem:'fa2026',status:'done',cat:'major', notes:'LACC Cert. CySA+'},
   {id:uid(),code:'CIS 166',     title:'Computer Forensics I',          units:3,sem:'fa2026',status:'done',cat:'major', notes:''},
   {id:uid(),code:'CIS 214',     title:'Network Plus',                  units:3,sem:'fa2026',status:'done',cat:'major', notes:'Req: CIS 210'},
   {id:uid(),code:'CS 119',      title:'Python Programming',            units:3,sem:'fa2026',status:'done',cat:'major', notes:'Req: CS 101'},
@@ -627,7 +627,11 @@ function loadCourses(){
   const have=new Set(saved.map(c=>String(c.code||'').trim().toLowerCase()));
   DEFAULT_COURSES.forEach(d=>{
     const key=d.code.trim().toLowerCase();
-    if(!have.has(key)&&!removedCodes.has(key)){saved.push({...d});have.add(key);}
+    if(!have.has(key)&&!removedCodes.has(key)){saved.push({...d});have.add(key);return;}
+    /* A default that gained a note after this visitor saved: carry the note
+       over only when their own note is still empty — never overwrite typing. */
+    const mine=saved.find(c=>String(c.code||'').trim().toLowerCase()===key);
+    if(mine&&!String(mine.notes||'').trim()&&String(d.notes||'').trim())mine.notes=d.notes;
   });
   return ensureUniqueIds(saved);
 }
