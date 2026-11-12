@@ -684,13 +684,21 @@ function loadMilestonePct(){const n=parseInt(lsRead(LS_BASE.ms));return n||0;}
 function saveMilestonePct(p){lsWrite(LS_BASE.ms,String(p));}
 let _prevMilestonePct=loadMilestonePct();
 let _firstStatsRender=true;
+/* Replacing the whole plan (Load Default Plan / Import) is not progress, so the
+   milestone popup is skipped and the new percentage is recorded silently.
+   Without this a reset that jumps the plan forward fires "Keep Going →" as if
+   the visitor had just finished a semester. */
+let _silentMilestone=false;
 
 function loadDefaultPlan(){
   if(!confirm(`Load the default ${DEFAULT_COURSES.length}-course plan?\nThis replaces your current plan.`))return;
   courses=DEFAULT_COURSES.map(c=>({...c}));
   removedCodes=new Set();saveRemoved(removedCodes);
   ensureSemesters(courses.map(c=>c.sem));
+  _silentMilestone=true;
   saveCourses();render();
+  /* Always answer: a reset that changes nothing used to look like a dead button. */
+  showToast(`📂 Default plan loaded — ${courses.length} courses`);
 }
 
 /* ── TOAST (manual save only) ── */
@@ -812,7 +820,9 @@ function importJSON(input){
         ensureSemesters(courses.map(c=>c.sem));
         removedCodes=new Set();saveRemoved(removedCodes);
         if(data.goal){goalUnits=parseInt(data.goal)||DEFAULT_GOAL;document.getElementById('goal-units').value=goalUnits;saveGoal(goalUnits);}
+        _silentMilestone=true;
         saveCourses();render();
+        showToast(`⬆ Imported ${courses.length} courses`);
       }
     }catch(err){alert('Import failed: '+err.message);}
     input.value='';
@@ -1098,6 +1108,7 @@ function renderStats(){
   /* First paint: record the milestone baseline silently — no popup for a page
      that simply loads at 67%. Popups only fire on progress made this session. */
   if(_firstStatsRender){_firstStatsRender=false;_prevMilestonePct=pct;saveMilestonePct(pct);}
+  else if(_silentMilestone){_silentMilestone=false;_prevMilestonePct=pct;saveMilestonePct(pct);}
   else checkMilestone(pct);
   return {totalUnits,doneUnits,inProg,planned,activeSems,catMap,semUnitMap,pct,goal};
 }
